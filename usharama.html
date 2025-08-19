@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UsharamaDMart</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='white'/><text x='50' y='62' font-size='58' text-anchor='middle' fill='red'>U</text></svg>">
+  <style>
+    :root{
+      --red:#e50914;
+      --blue:#1f6feb;
+      --black:#0a0a0a;
+      --white:#ffffff;
+      --muted:#f5f5f5;
+      --shadow: 0 10px 25px rgba(0,0,0,.08);
+      --radius: 16px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--muted);color:#121212}
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1200px, 92%); margin-inline:auto}
+
+    /* Header */
+    header{position:sticky;top:0;z-index:50;background:linear-gradient(0deg, rgba(10,10,10,.85), rgba(10,10,10,.95));backdrop-filter: blur(8px); color:var(--white); box-shadow: var(--shadow)}
+    .nav{display:flex;align-items:center;gap:16px; padding:14px 0}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
+    .brand-logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--red),var(--blue));display:grid;place-items:center;color:var(--white);font-weight:900}
+    nav{margin-left:auto;display:flex;gap:10px;align-items:center}
+    .nav a{padding:10px 14px;border-radius:999px; transition: .2s background}
+    .nav a.active, .nav a:hover{background:rgba(255,255,255,.12)}
+
+    .btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .btn.primary{background:var(--red);color:var(--white)}
+    .btn.secondary{background:var(--blue);color:var(--white)}
+    .btn.ghost{background:#fff;border:1px solid #eaeaea}
+    .btn.icon{padding:8px;border-radius:12px}
+    .badge{background:var(--red);color:#fff;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:700}
+
+    /* Sections */
+    section{display:none;padding:28px 0 48px}
+    section.active{display:block}
+
+    /* Hero */
+    .hero{background:linear-gradient(120deg, rgba(229,9,20,.12), rgba(31,111,235,.12)); border-bottom:1px solid #eaeaea}
+    .hero-card{display:grid;grid-template-columns:1.1fr .9fr; gap:28px; align-items:center}
+    @media (max-width: 900px){.hero-card{grid-template-columns:1fr}}
+    .panel{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px}
+
+    /* Products */
+    .toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:18px 0}
+    .search{flex:1; display:flex; gap:8px}
+    .search input{flex:1;padding:12px 14px;border:1px solid #e5e7eb;border-radius:12px}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+    @media (max-width: 1000px){.grid{grid-template-columns:repeat(3,1fr)}}
+    @media (max-width: 700px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width: 480px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--white);border-radius:var(--radius); box-shadow: var(--shadow); overflow:hidden; display:flex;flex-direction:column}
+    .card .thumb{aspect-ratio: 16/11; background:linear-gradient(135deg, rgba(229,9,20,.25), rgba(31,111,235,.25)); display:grid; place-items:center; color:#fff; font-weight:800; font-size:28px}
+    .card .body{padding:14px;display:grid;gap:8px}
+    .price{font-weight:800;color:#0f172a}
+    .old{color:#64748b;text-decoration:line-through;font-weight:500;margin-left:8px}
+    .card .actions{margin-top:10px;display:flex;gap:8px}
+
+    /* Cart */
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px 10px;text-align:left}
+    thead th{border-bottom:2px solid #e5e7eb;color:#111827}
+    tbody td{border-bottom:1px solid #f1f5f9}
+    .qty{display:inline-flex;align-items:center;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden}
+    .qty button{border:0;background:transparent;padding:6px 10px;cursor:pointer}
+    .qty input{width:42px;text-align:center;border:0;padding:6px}
+
+    .summary{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;position:sticky;top:92px}
+    .summary .row{display:flex;justify-content:space-between;margin:8px 0}
+    .summary .total{font-weight:900;font-size:20px}
+
+    /* Auth */
+    dialog{border:0;border-radius:18px; width:min(460px, 92%); box-shadow: var(--shadow)}
+    dialog::backdrop{background:rgba(0,0,0,.45)}
+    .field{display:grid;gap:6px;margin:10px 0}
+    .field input, .field select{padding:12px 14px;border:1px solid #e5e7eb;border-radius:12px}
+    .muted{color:#64748b;font-size:14px}
+
+    /* Footer */
+    footer{border-top:1px solid #eaeaea;background:#fff;color:#111;padding:28px 0;margin-top:40px}
+    .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:20px}
+    @media (max-width: 800px){.cols{grid-template-columns:1fr}}
+    .credit{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;color:#64748b;font-size:14px}
+
+    .pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 12px;border:1px solid #e5e7eb;background:#fff}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="brand-logo">U</div>
+        <div>
+          <div style="font-size:18px;line-height:1">UsharamaDMart</div>
+          <div class="muted" style="font-size:12px">Red • Blue • Black • White</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#home" data-link>Home</a>
+        <a href="#products" data-link>Products</a>
+        <a href="#cart" data-link>Cart <span id="cartCount" class="badge">0</span></a>
+        <a href="#admin" id="adminLink" data-link style="display:none">Admin</a>
+        <button class="btn icon" id="loginBtn" title="Login" aria-label="Login" style="background:#111;color:#fff">🔒</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HOME -->
+  <section id="home" class="hero active">
+    <div class="container">
+      <div class="hero-card">
+        <div class="panel">
+          <h1 style="margin:0 0 10px;font-size:34px">Welcome to <span style="color:var(--red)">Usharama</span><span style="color:var(--blue)">DMart</span></h1>
+          <p style="margin:0 0 12px;color:#334155">Your friendly neighbourhood store with sharp prices in ₹, bold colours, and a super clean cart. Built with pure HTML, CSS and JS.</p>
+          <div class="pill">
+            <span>🛍️ Daily Essentials</span>
+            <span>•</span>
+            <span>⚡ Fast Checkout</span>
+            <span>•</span>
+            <span>🧾 GST Friendly</span>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+            <a href="#products" class="btn primary">Shop Now</a>
+            <a href="#cart" class="btn secondary">View Cart</a>
+          </div>
+        </div>
+        <div class="panel" style="background:linear-gradient(120deg, #fff, rgba(0,0,0,.02));display:grid;place-items:center">
+          <div style="text-align:center">
+            <div style="font-size:64px">🧺</div>
+            <h3 style="margin:6px 0 6px">Red • Blue • Black • White</h3>
+            <p class="muted" style="margin:0">A colour-first storefront with Indian Rupee pricing and smart calculations.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section id="products">
+    <div class="container">
+      <div class="toolbar">
+        <div class="search">
+          <input id="searchInput" type="search" placeholder="Search products (name, category)…"/>
+          <select id="categoryFilter">
+            <option value="">All Categories</option>
+          </select>
+        </div>
+        <div>
+          <button id="sortPriceAsc" class="btn ghost">Price ↑</button>
+          <button id="sortPriceDesc" class="btn ghost">Price ↓</button>
+        </div>
+      </div>
+      <div id="productsGrid" class="grid"></div>
+    </div>
+  </section>
+
+  <!-- CART -->
+  <section id="cart">
+    <div class="container" style="display:grid;grid-template-columns:1.6fr .8fr;gap:20px">
+      <div class="panel">
+        <h2 style="margin:0 0 8px">Your Cart</h2>
+        <div class="muted">Adjust quantities, remove items, and proceed to checkout.</div>
+        <div id="cartEmpty" class="panel" style="display:none;margin-top:16px;background:#fafafa;border:1px dashed #e5e7eb">
+          Cart is empty. <a href="#products" style="color:var(--blue);font-weight:600">Add some products →</a>
+        </div>
+        <div style="overflow:auto;margin-top:12px">
+          <table id="cartTable" aria-label="Cart Items">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Qty</th>
+                <th>Subtotal</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="summary">
+        <h3 style="margin:0 0 10px">Order Summary</h3>
+        <div class="row"><span>Items</span><span id="summaryItems">0</span></div>
+        <div class="row"><span>Subtotal</span><span id="summarySubtotal">₹0</span></div>
+        <div class="row"><span>Discount</span><span id="summaryDiscount">- ₹0</span></div>
+        <div class="row"><span>GST (18%)</span><span id="summaryTax">₹0</span></div>
+        <div class="row total"><span>Total</span><span id="summaryTotal">₹0</span></div>
+        <button class="btn primary" style="width:100%;margin-top:12px" id="checkoutBtn">Proceed to Checkout</button>
+        <div class="muted" style="margin-top:8px">(Demo) Checkout will just clear the cart and thank you 🙂</div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ADMIN (demo) -->
+  <section id="admin">
+    <div class="container" style="display:grid;grid-template-columns:1.2fr .8fr;gap:20px">
+      <div class="panel">
+        <h2 style="margin:0 0 10px">Admin • Product Manager</h2>
+        <div class="muted">Add new products or update stock. (Demo only, local to your browser)</div>
+        <form id="productForm" style="margin-top:12px">
+          <div class="field">
+            <label>Product Name</label>
+            <input required id="pName" placeholder="e.g., Aashirvaad Atta 5kg"/>
+          </div>
+          <div class="field">
+            <label>Category</label>
+            <input required id="pCategory" placeholder="e.g., Groceries"/>
+          </div>
+          <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <label>Price (₹)</label>
+              <input required id="pPrice" type="number" step="0.01" min="0" placeholder="e.g., 299"/>
+            </div>
+            <div>
+              <label>MRP (₹)</label>
+              <input id="pMrp" type="number" step="0.01" min="0" placeholder="Optional"/>
+            </div>
+          </div>
+          <div class="field">
+            <label>Image (emoji or text)</label>
+            <input id="pImage" placeholder="e.g., 🫙 or 🧼"/>
+          </div>
+          <button class="btn secondary" type="submit">Add / Update Product</button>
+        </form>
+      </div>
+      <div class="panel">
+        <h3 style="margin:0 0 8px">Current Products</h3>
+        <div id="adminList" class="grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOGIN MODAL -->
+  <dialog id="authDialog">
+    <form method="dialog" class="panel" style="margin:0">
+      <h3 style="margin:0 0 6px">Login</h3>
+      <div class="muted">Choose role and enter credentials (demo):</div>
+      <div class="field">
+        <label>Role</label>
+        <select id="authRole">
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input id="authEmail" type="email" placeholder="you@example.com" required />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="authPass" type="password" placeholder="••••••••" required />
+      </div>
+      <div class="muted">Demo credentials — User: user@demo.in / 123456 • Admin: admin@demo.in / 123456</div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px">
+        <button class="btn ghost" value="cancel">Cancel</button>
+        <button class="btn primary" id="authSubmit" value="confirm">Login</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer>
+    <div class="container">
+      <div class="cols">
+        <div>
+          <strong>UsharamaDMart</strong>
+          <p class="muted">A demo storefront using red, blue, black and white. Prices shown in Indian Rupees with cart calculations, user/admin login, and a simple admin panel.</p>
+        </div>
+        <div>
+          <div><strong>Quick Links</strong></div>
+          <div style="display:grid;gap:6px;margin-top:8px">
+            <a href="#home">Home</a>
+            <a href="#products">Products</a>
+            <a href="#cart">Cart</a>
+            <a href="#admin">Admin</a>
+          </div>
+        </div>
+        <div>
+          <div><strong>Support</strong></div>
+          <div class="muted" style="margin-top:8px">This is an offline demo. Data persists in your browser only.</div>
+        </div>
+      </div>
+      <div class="credit">
+        <span>© <span id="year"></span> UsharamaDMart</span>
+        <span class="muted">Made with ♥ in HTML, CSS & JS</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ----- Utilities
+    const fmtINR = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 });
+    const qs = (sel, el=document) => el.querySelector(sel);
+    const qsa = (sel, el=document) => [...el.querySelectorAll(sel)];
+    const save = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+    const load = (k,def) => { try { return JSON.parse(localStorage.getItem(k)) ?? def } catch { return def } };
+
+    // ----- Seed Data
+    const DEFAULT_PRODUCTS = [
+      {id:'p1', name:'Aashirvaad Atta 5kg', category:'Groceries', price:329, mrp:385, image:'🌾'},
+      {id:'p2', name:'Tata Salt 1kg', category:'Groceries', price:24, mrp:28, image:'🧂'},
+      {id:'p3', name:'Amul Taaza 1L', category:'Dairy', price:68, mrp:72, image:'🥛'},
+      {id:'p4', name:'Parle-G 800g', category:'Snacks', price:85, mrp:95, image:'🍪'},
+      {id:'p5', name:'Maggi Noodles 12x', category:'Snacks', price:164, mrp:180, image:'🍜'},
+      {id:'p6', name:'Fortune Sunflower Oil 1L', category:'Groceries', price:126, mrp:140, image:'🛢️'},
+      {id:'p7', name:'Colgate Toothpaste 200g', category:'Personal Care', price:95, mrp:110, image:'🦷'},
+      {id:'p8', name:'Surf Excel 1kg', category:'Home Care', price:189, mrp:210, image:'🧼'},
+      {id:'p9', name:'Dettol Handwash 750ml', category:'Personal Care', price:155, mrp:175, image:'🫧'},
+      {id:'p10', name:'Britannia Bread', category:'Bakery', price:38, mrp:42, image:'🍞'},
+      {id:'p11', name:'Good Day 600g', category:'Snacks', price:110, mrp:125, image:'🍪'},
+      {id:'p12', name:'Nescafé Classic 100g', category:'Beverages', price:325, mrp:360, image:'☕'},
+    ];
+
+    let products = load('udm_products', DEFAULT_PRODUCTS);
+    let cart = load('udm_cart', {}); // {id: qty}
+    let auth = load('udm_auth', { role: 'guest', email: null });
+
+    // ----- Routing
+    function setActiveLink(){
+      const hash = location.hash || '#home';
+      qsa('nav a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === hash));
+    }
+    function showSection(){
+      const hash = location.hash || '#home';
+      qsa('section').forEach(s => s.classList.remove('active'));
+      qs(hash)?.classList.add('active');
+    }
+    window.addEventListener('hashchange', () => { setActiveLink(); showSection(); });
+
+    // ----- Render Products
+    function uniqueCategories(){
+      return [...new Set(products.map(p => p.category))].sort();
+    }
+    function fillCategoryFilter(){
+      const sel = qs('#categoryFilter');
+      sel.innerHTML = '<option value="">All Categories</option>' + uniqueCategories().map(c=>`<option value="${c}">${c}</option>`).join('');
+    }
+    function renderProducts(list = products){
+      const grid = qs('#productsGrid');
+      grid.innerHTML = '';
+      list.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="thumb">${p.image || '🛒'}</div>
+          <div class="body">
+            <div style="display:flex;justify-content:space-between;gap:10px;align-items:start">
+              <div>
+                <div style="font-weight:700">${p.name}</div>
+                <div class="muted" style="font-size:12px">${p.category}</div>
+              </div>
+              <div>
+                <span class="price">${fmtINR.format(p.price)}</span>
+                ${p.mrp ? `<span class="old">${fmtINR.format(p.mrp)}</span>` : ''}
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn primary" data-add='${p.id}'>Add to Cart</button>
+              <button class="btn" style="background:#111;color:#fff" data-buy='${p.id}'>Buy Now</button>
+            </div>
+          </div>`;
+        grid.appendChild(card);
+      });
+      // Bind buttons
+      qsa('[data-add]').forEach(b=> b.onclick = () => addToCart(b.dataset.add));
+      qsa('[data-buy]').forEach(b=> b.onclick = () => { addToCart(b.dataset.buy); location.hash = '#cart'; });
+    }
+
+    // ----- Cart Logic
+    function addToCart(id, qty=1){
+      cart[id] = (cart[id] || 0) + qty;
+      save('udm_cart', cart);
+      updateCartBadge();
+      renderCart();
+    }
+    function removeFromCart(id){
+      delete cart[id];
+      save('udm_cart', cart);
+      updateCartBadge();
+      renderCart();
+    }
+    function updateCartBadge(){
+      const count = Object.values(cart).reduce((a,b)=>a+b,0);
+      qs('#cartCount').textContent = count;
+    }
+    function cartItems(){
+      return Object.entries(cart).map(([id, qty]) => {
+        const p = products.find(x=>x.id===id);
+        return { ...p, qty, subtotal: (p?.price||0) * qty };
+      }).filter(x=>x.id);
+    }
+    function renderCart(){
+      const body = qs('#cartTable tbody');
+      const items = cartItems();
+      body.innerHTML = '';
+      qs('#cartEmpty').style.display = items.length ? 'none':'block';
+      items.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="pill">${item.image || '🛒'}</div>
+              <div>
+                <div style="font-weight:700">${item.name}</div>
+                <div class="muted" style="font-size:12px">${item.category}</div>
+              </div>
+            </div>
+          </td>
+          <td>${fmtINR.format(item.price)}</td>
+          <td>
+            <div class="qty">
+              <button aria-label="decrease" onclick="changeQty('${item.id}', -1)">−</button>
+              <input value="${item.qty}" aria-label="quantity" oninput="setQty('${item.id}', this.value)"/>
+              <button aria-label="increase" onclick="changeQty('${item.id}', 1)">+</button>
+            </div>
+          </td>
+          <td>${fmtINR.format(item.subtotal)}</td>
+          <td><button class="btn" style="background:#fff;border:1px solid #e5e7eb" onclick="removeFromCart('${item.id}')">Remove</button></td>
+        `;
+        body.appendChild(tr);
+      });
+      updateSummary();
+    }
+    function changeQty(id, delta){
+      cart[id] = Math.max(0, (cart[id]||0) + delta);
+      if(cart[id]===0) delete cart[id];
+      save('udm_cart', cart);
+      updateCartBadge();
+      renderCart();
+    }
+    function setQty(id, val){
+      const n = Math.max(0, parseInt(val||0,10));
+      if(n===0) delete cart[id]; else cart[id]=n;
+      save('udm_cart', cart);
+      updateCartBadge();
+      renderCart();
+    }
+    function updateSummary(){
+      const items = cartItems();
+      const subtotal = items.reduce((a,x)=>a+x.subtotal,0);
+      const discount = items.reduce((a,x)=> a + (x.mrp && x.mrp>x.price ? (x.mrp-x.price)*x.qty : 0), 0);
+      const tax = Math.round((subtotal - 0) * 0.18);
+      const total = subtotal + tax;
+      qs('#summaryItems').textContent = items.reduce((a,x)=>a+x.qty,0);
+      qs('#summarySubtotal').textContent = fmtINR.format(subtotal);
+      qs('#summaryDiscount').textContent = `- ${fmtINR.format(discount)}`;
+      qs('#summaryTax').textContent = fmtINR.format(tax);
+      qs('#summaryTotal').textContent = fmtINR.format(total);
+    }
+
+    // ----- Auth (Demo)
+    function refreshAuthUI(){
+      const isAdmin = auth.role === 'admin';
+      const adminLink = qs('#adminLink');
+      adminLink.style.display = isAdmin ? 'inline-flex' : 'none';
+      qs('#loginBtn').textContent = auth.email ? '🔓' : '🔒';
+      qs('#loginBtn').title = auth.email ? `Logged in as ${auth.email} (${auth.role})` : 'Login';
+    }
+    function login(email, pass, role){
+      const valid = (role==='admin' && email==='admin@demo.in' && pass==='123456') ||
+                    (role==='user'  && email==='user@demo.in'  && pass==='123456');
+      if(!valid){ alert('Invalid credentials (demo).'); return false; }
+      auth = { role, email };
+      save('udm_auth', auth);
+      refreshAuthUI();
+      if(role==='admin') location.hash = '#admin';
+      return true;
+    }
+    function logout(){ auth = { role:'guest', email:null }; save('udm_auth', auth); refreshAuthUI(); }
+
+    // ----- Admin Product CRUD (basic)
+    function upsertProduct({id, name, category, price, mrp, image}){
+      const existing = products.find(p=>p.id===id || p.name.toLowerCase()===name.toLowerCase());
+      if(existing){
+        existing.name = name; existing.category = category; existing.price = price; existing.mrp = mrp; existing.image = image;
+      } else {
+        const newId = 'p' + Math.random().toString(36).slice(2,8);
+        products.push({ id:newId, name, category, price, mrp, image });
+      }
+      save('udm_products', products);
+      fillCategoryFilter();
+      renderProducts();
+      renderAdminList();
+    }
+    function deleteProduct(id){
+      products = products.filter(p=>p.id!==id);
+      save('udm_products', products);
+      renderProducts();
+      renderAdminList();
+    }
+
+    function renderAdminList(){
+      const wrap = qs('#adminList');
+      wrap.innerHTML = '';
+      products.forEach(p=>{
+        const el = document.createElement('div');
+        el.className = 'card';
+        el.innerHTML = `
+          <div class="thumb">${p.image||'🛒'}</div>
+          <div class="body">
+            <div style="display:flex;justify-content:space-between">
+              <div>
+                <div style="font-weight:700">${p.name}</div>
+                <div class="muted" style="font-size:12px">${p.category}</div>
+              </div>
+              <div>
+                <span class="price">${fmtINR.format(p.price)}</span>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn secondary" onclick='prefillForm(${JSON.stringify(p)})'>Edit</button>
+              <button class="btn" style="background:#fff;border:1px solid #e5e7eb" onclick="deleteProduct('${p.id}')">Delete</button>
+            </div>
+          </div>`
+        wrap.appendChild(el);
+      })
+    }
+    function prefillForm(p){
+      qs('#pName').value = p.name;
+      qs('#pCategory').value = p.category;
+      qs('#pPrice').value = p.price;
+      qs('#pMrp').value = p.mrp || '';
+      qs('#pImage').value = p.image || '';
+    }
+
+    // ----- Search & Sort
+    function applyFilters(){
+      const q = qs('#searchInput').value.toLowerCase().trim();
+      const cat = qs('#categoryFilter').value;
+      let list = products.filter(p=> (!cat || p.category===cat) && (!q || (p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q))));
+      renderProducts(list);
+    }
+
+    // ----- Init
+    function init(){
+      document.getElementById('year').textContent = new Date().getFullYear();
+      setActiveLink();
+      showSection();
+      fillCategoryFilter();
+      renderProducts();
+      updateCartBadge();
+      renderCart();
+      refreshAuthUI();
+
+      // Events
+      qs('#loginBtn').onclick = () => { if(auth.email){ if(confirm('Logout?')) logout(); } else qs('#authDialog').showModal(); };
+      qs('#authSubmit').onclick = (e)=>{
+        e.preventDefault();
+        const role = qs('#authRole').value; const email = qs('#authEmail').value; const pass = qs('#authPass').value;
+        if(login(email, pass, role)) qs('#authDialog').close();
+      };
+
+      qs('#productForm').onsubmit = (e)=>{
+        e.preventDefault();
+        if(auth.role !== 'admin'){ alert('Admin only.'); return; }
+        const data = {
+          id: qs('#pName').value.toLowerCase().replace(/\s+/g,'-'),
+          name: qs('#pName').value.trim(),
+          category: qs('#pCategory').value.trim(),
+          price: Number(qs('#pPrice').value),
+          mrp: qs('#pMrp').value ? Number(qs('#pMrp').value) : undefined,
+          image: qs('#pImage').value.trim()
+        };
+        upsertProduct(data);
+        e.target.reset();
+        alert('Saved.');
+      }
+
+      qsa('#sortPriceAsc, #sortPriceDesc').forEach(btn=> btn.onclick = ()=>{
+        const asc = btn.id==='sortPriceAsc';
+        products.sort((a,b)=> asc ? a.price-b.price : b.price-a.price);
+        applyFilters();
+      });
+      qs('#searchInput').oninput = applyFilters;
+      qs('#categoryFilter').onchange = applyFilters;
+
+      qs('#checkoutBtn').onclick = ()=>{
+        if(Object.keys(cart).length===0){ alert('Cart is empty'); return; }
+        const total = qs('#summaryTotal').textContent;
+        if(confirm(`Pay ${total}? (Demo)`)){
+          cart = {}; save('udm_cart', cart); updateCartBadge(); renderCart();
+          alert('Thank you for shopping at UsharamaDMart!');
+        }
+      };
+
+      renderAdminList();
+    }
+
+    init();
+
+    // Expose a couple for inline handlers
+    window.removeFromCart = removeFromCart;
+    window.changeQty = changeQty;
+    window.setQty = setQty;
+    window.prefillForm = prefillForm;
+  </script>
+</body>
+</html>
